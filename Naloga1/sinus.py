@@ -70,10 +70,10 @@ class App(QWidget):
         tim = float(self.time_limit.text())
         typ = int(self.type_group.checkedId())
 
-        make_graph(amp, pha, fre, sfr, tim, typ)
+        make_graph(amplitude=amp, phase=pha, frequency=fre, sampling_rate=sfr, time_limit=tim, graph_type=typ)
 
 
-def make_graph(amplitude=1, phase=1, frequency=1, sampling_rate=100, time_limit=10, type=1):
+def make_graph(amplitude=1.0, phase=0.0, frequency=1.0, sampling_rate=100.0, time_limit=10.0, graph_type=1):
     """
     Narise graf sinusoide s podanimi parametri
 
@@ -90,7 +90,7 @@ def make_graph(amplitude=1, phase=1, frequency=1, sampling_rate=100, time_limit=
     fig = plt.figure()
 
     # Preveri ali risemo navadno (1) ali analiticno funkcijo (2)
-    if type == 2:
+    if graph_type == 2:
         # Uporabimo Eulerjevo formulo za izracun tock
         # A*e^(j * 2pi * f * t + faz) = Asin(2pi *f *t +faz) + j*A*cos(2pi *f *t +faz)
         result = amplitude * numpy.sin(time_interval * 2 * math.pi * frequency + phase) \

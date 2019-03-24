@@ -7,3 +7,6 @@
 # Latex
 *.dvi
 *.out
+*.aux
+*.log
+*.gz
