@@ -119,16 +119,6 @@ def make_graph(amplitude=1.0, phase=0.0, frequency=1.0, sampling_rate=100.0, tim
         ax.scatter(time_interval, result.real, result.imag, label='Vzorcne tocke', color='red')
         ax.plot(proper_time, proper_result.real, proper_result.imag, label='"Dejanski" signal', alpha=0.5)
 
-        # V kolikor ne vzorcimo z vsaj 2*frequency, narisi se alias frekvenco
-        if sampling_rate / frequency < 2:
-            # f_a = | f - k * f_s |
-            alias_frequency = abs(frequency - 1 * sampling_rate)
-            # Funkcija za izracun analiticne alias frekvence
-            alias_result = amplitude * numpy.sin(proper_time * 2 * math.pi * alias_frequency + phase) \
-                + 1j * amplitude * numpy.cos(proper_time * 2 * math.pi * alias_frequency + phase)
-            # Narisi crtkano alias frekvenco na graf
-            ax.plot(proper_time, alias_result.real, alias_result.imag,
-                    linestyle='dashed', color='green', label='Alias frekvenca')
     else:
         # Poracunaj tocke za realno sinusoido
         result = amplitude * numpy.sin(time_interval * 2 * math.pi * frequency + phase)

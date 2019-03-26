@@ -36,6 +36,11 @@ class App(QWidget):
         self.input_frequency4 = QLineEdit('4')
         self.input_phase4 = QLineEdit('4')
 
+        # Vzorcenje
+        self.input_sampling_rate = QSpinBox()
+        self.input_sampling_rate.setMaximum(10000)
+        self.input_sampling_rate.setMinimum(1)
+        self.input_sampling_rate.setValue(100)
         self.InitUI()
 
     def InitUI(self):
@@ -85,6 +90,8 @@ class App(QWidget):
 
         self.setLayout(layout_main)
 
+        layout_sin4_form.addRow("F. vzorcenja", self.input_sampling_rate)
+
         canvas = FigureCanvas(Figure(figsize=(6, 6), dpi=100))
         layout_main.addWidget(canvas)
         self.ax = canvas.figure.subplots()
@@ -94,7 +101,7 @@ class App(QWidget):
 
 
     def update_canvas(self):
-        time_interval = np.arange(0, 3, 0.01)
+        time_interval = np.arange(0, 3, 1/self.input_sampling_rate.value())
         A1 = float(self.input_amplitude1.text() or 0)
         A2 = float(self.input_amplitude2.text() or 0)
         A3 = float(self.input_amplitude3.text() or 0)
@@ -117,23 +124,6 @@ class App(QWidget):
         self.ax.set_xlim([0, 3.2])
         self.ax.plot(time_interval, s1+s2+s3+s4)
         self.ax.figure.canvas.draw()
-
-    def animate(self, i):
-        '''A1 = 1
-        A2 = 2
-        A3 = 3
-        A4 = 4
-        f1 = 10
-        f2 = 2
-        f3 = 7
-        f4 = 4
-        s1 = np.sin(A1 * np.pi * f1 * time_interval + i / 10 + 1)
-        s2 = np.sin(A2 * np.pi * f2 * time_interval + i / 10 + 2)
-        s3 = np.sin(A3 * np.pi * f3 * time_interval + i / 10 + 3)
-        s4 = np.sin(A4 * np.pi * f4 * time_interval + i / 10 + 4)
-        line.set_ydata(s1 + s2 + s3)
-        return line,'''
-        pass
 
 
 if __name__ == '__main__':
