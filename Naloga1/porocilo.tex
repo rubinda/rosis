@@ -29,8 +29,8 @@ basicstyle=\ttfamily\footnotesize\setstretch{1},
 backgroundcolor=\color{light-gray},
 }
 
-\title{Naslov domače naloge}
-\author{Ime Priimek (vpisna številka)}
+\title{Risanje sinusoid}
+\author{David Rubin (david.rubin@student.um.si)}
 \date{\today}
 
 \begin{document}
@@ -45,121 +45,41 @@ Odgovorite na naslednja vprašanja:
 \begin{enumerate}
 	\item Pri katerih vzorčevalnih frekvencah se izbrana sinusoida ne prikaže pravilno in katera izmed njenih lastnosti (amplituda, frekvenca, faza) se pri tem spremeni ter kako (t.j. kako se spremeni amplituda, kako faza in kako frekvenca prikazane sinusoide)?
  	\item Se je ob tem spremenila dejanska sinusoida ali le njen prikaz? Kaj to pomeni za analizo digitalnih signalov?
-	\item Kako pa se s frekvenco vzorčenja spremenijo amplituda, faza in frekvenca sinusoide, če uporabimo analitičen zapis sinusoide, torej če sinusoido zapišemo s kompleksnimi števili: s(t) = A*sin(2*pi*frek*t+faz) + j*A*cos(2*pi*frek*t+faz), kjer je A amplituda, frek frekvenca in faz faza, j pa je imaginarna enota (kvadratni koren iz -1)?
+	\item Kako pa se s frekvenco vzorčenja spremenijo amplituda, faza in frekvenca sinusoide, če uporabimo analitičen zapis sinusoide, torej če sinusoido zapišemo s kompleksnimi števili: $s(t) = A\cdot \sin(2\pi \cdot f \cdot t + \varphi) + j \cdot A \cdot \cos(2 \pi \cdot f + \varphi)$, kjer je $A$ amplituda, $f$ frekvenca in $\varphi$ faza, $j$ pa je imaginarna enota ($\sqrt{-1}$)?
 	\item Kaj smo torej pridobili z analitičnim zapisom sinusoide in kaj smo za to žrtvovali?
 
 
 \end{enumerate}
 
-\section{Podatki}
+\section{Poročilo}
 
-Če je naloga zasnovana tako, da vključuje analizo izbranih podatkov, v
-tem razdelku opišeš, kakšni so ti podatki in navedeš nekaj osnovnih
-statističnih lastnosti teh podatkov. Slednje vključujejo velikost
-podatkov (na primer število primerov, število in vrsto atributov), delež
-manjkajočih podatkov, opis in porazdelitev vrednosti ciljnih
-spremenljivk, in podobno. Če si podatke pridobil sam, tu opišeš, na
-kakšen način, kje in kako.
+Rešitev sem implementiral kot Python program (za delovanje potrebuje PyQt5, matplotlib in numpy), ki je priložen poročilu (\textit{sinus.py}).
 
-\section{Metode}
+\begin{enumerate}
+	\item\textbf{ Pri katerih vzorčevalnih frekvencah se izbrana sinusoida ne prikaže pravilno in katera izmed njenih lastnosti (amplituda, frekvenca, faza) se pri tem spremeni ter kako (t.j. kako se spremeni amplituda, kako faza in kako frekvenca prikazane sinusoide)?}
 
-Tu opišeš, na kakšen način si rešil nalogo (tehnike in metode, ki si
-jih uporabil). Lahko vključiš tudi zanimiv del programske kode, ki
-si jo morda pri tem razvil ali pa v poročilo dodatno vključiš sliko,
-kot je na primer slika~\ref{slika1}. Vse slike in tabele, ki jih
-vključiš v poročilo, morajo biti navedene v besedilu oziroma se moraš
-na njih sklicati.
+		V kolikor smo signal vzorčili s frekvenco, ki je nižja od $2 \cdot f$, se nam pojavijo tako imenovane alias frekvence. Točke pri vzorčenju nam pri prenizki vzorčevalni frekvenci ($f_s < 2 \cdot f$) sovpdajeo s sinusoidami nižjih frekvenc. Amplituda se načeloma ne spremeni (v kolikor jo znamo iz realnega grafa pravilno prebrati), spremenita se pa frekvenca, saj je sedaj v signalu poleg dejanske prisotna tudi nižja, ki ima lahko tudi različno fazo od prvotne (glej sliko~\ref{slika1}).	
+	\begin{figure}[htbp]
+	\begin{center}
+	\includegraphics[scale=0.6]{alias.png}
+	\caption{Pojavitev nižje frekvence pri nezadostno visoki frekvenci vzorčenja.}
+	\label{slika1}
+	\end{center}
+	\end{figure}
 
 
-V to poglavje lahko tudi vključiš kakšen metodološko zanimiv del
-kode. Primer vključitve kode oziroma implementirane funkcije v
-programskem jeziku Python je:
+ 	\item \textbf{Se je ob tem spremenila dejanska sinusoida ali le njen prikaz? Kaj to pomeni za analizo digitalnih signalov?}
 
-\begin{lstlisting}
-def fib(n):
-    if n == 0:
-        return 0
-    elif n == 1:
-        return 1
-    else:
-        return fib(n-1) + fib(n-2)
-\end{lstlisting}
+	Ob tem pojavu se dejanska sinusoida ne spremeni. Zaradi ``slabega'' vzorčenja, ki smo ga izvajali pa smo popačili našo predstavitev tega signala. V kolikor te popačene podatke uporabimo za analizo prvotnega signala (ali pa ga poskušamo rekonstruirati) bomo dobili slabe rezultate. S prenizko vzorčevalno frekvenco nismo samo izgubili del podatkov, ampak smo v signal vnesli tudi \textit{aliasing} in si popačili preostali signal.
 
-Izris te kode je lahko sicer tudi lepši, poskušaš lahko najti še
-primernejši način vključevanja kode v Pythonu oziroma v tvojem izbranem
-programskem jeziku v okolje \LaTeX{}.
+ 	
+	\item \textbf{Kako pa se s frekvenco vzorčenja spremenijo amplituda, faza in frekvenca sinusoide, če uporabimo analitičen zapis sinusoide, torej če sinusoido zapišemo s kompleksnimi števili: $s(t) = A\cdot \sin(2\pi \cdot f \cdot t + \varphi) + j \cdot A \cdot \cos(2 \pi \cdot f + \varphi)$, kjer je $A$ amplituda, $f$ frekvenca in $\varphi$ faza, $j$ pa je imaginarna enota ($\sqrt{-1}$)?}
+	
+	
+	\item \textbf{Kaj smo torej pridobili z analitičnim zapisom sinusoide in kaj smo za to žrtvovali?}
+	
+	Z analitičnim zapisom smo veliko bolje predstavili našo sinusoido, saj je trivialno razbrati amplitudo in fazo podanega signala. Pri tem pa smo porabili $2\times$ več prostora za opis krivulje.
 
-\section{Rezultati}
-
-V tem poglavju podaš rezultate s kratkim (enoodstavčnim)
-komentarjem. Rezultate lahko prikažeš tudi v tabeli (primer je
-tabela~\ref{tab1}).
-
-Odstavke pri pisanju poročila v LaTeX-u ločiš tako, da pred novim
-odstavkom pustiš prazno vrstico. Tudi, če pišeš poročilo v kakšnem
-drugem urejevalniku, morajo odstavki biti vidno ločeni. To narediš z
-zamikanjem ali pa z dodatnim presledkom.
-
-\begin{table}[htbp]
-\caption{Atributi in njihove zaloge vrednosti.}
-\label{tab1}
-\begin{center}
-\begin{tabular}{llp{3cm}}
-\hline
-ime spremenljivke & definicijsko območje & opis \\
-\hline
-cena & [0, 500] & cena izdelka v EUR\\
-teža & [1, 1000] & teža izdelka v dag \\
-kakovost & [slaba|srednja|dobra] & kakovost izdelka \\
-\hline
-\end{tabular}
-\end{center}
-\end{table}
-
-Podajanje rezultati naj bo primerno strukturirano. Če ima naloga več
-podnalog, uporabi podpoglavja. Če bi želel poročati o rezultatih
-izčrpno in pri tem uporabiti vrsto tabel ali grafov, razmisli o
-varianti, kjer v tem poglavju prikažeš in komentiraš samo glavne
-rezultate, kakšne manj zanimive detajle pa vključite v prilogo (glej
-prilogi~\ref{app-res} in~\ref{app-code}).
-
-\section{Izjava o izdelavi domače naloge}
-Domačo nalogo in pripadajoče programe sem izdelal sam.
-
-\appendix
-\appendixpage
-\section{\label{app-res}Podrobni rezultati poskusov}
-
-Če je rezultatov v smislu tabel ali pa grafov v nalogi mnogo,
-predstavi v osnovnem besedilu samo glavne, podroben prikaz
-rezultatov pa lahko predstaviš v prilogi. V glavnem besedilu ne
-pozabi navesti, da so podrobni rezultati podani v prilogi.
-
-\section{\label{app-code}Programska koda}
-
-Za domače naloge bo tipično potrebno kaj sprogramirati. Če ne bo od
-vas zahtevano, da kodo oddate posebej, to vključite v prilogo. Čisto
-za okus sem tu postavil nekaj kode, ki uporablja Orange
-(\url{http://www.biolab.si/orange}) in razvrščanje v skupine.
-
-
-\begin{lstlisting}
-import random
-import Orange
-
-data_names = ["iris", "housing", "vehicle"]
-data_sets = [Orange.data.Table(name) for name in data_names]
-
-print "%10s %3s %3s %3s" % ("", "Rnd", "Div", "HC")
-for data, name in zip(data_sets, data_names):
-    random.seed(42)
-    km_random = Orange.clustering.kmeans.Clustering(data, centroids = 3)
-    km_diversity = Orange.clustering.kmeans.Clustering(data, centroids = 3,
-        initialization=Orange.clustering.kmeans.init_diversity)
-    km_hc = Orange.clustering.kmeans.Clustering(data, centroids = 3,
-        initialization=Orange.clustering.kmeans.init_hclustering(n=100))
-    print "%10s %3d %3d %3d" % (name, km_random.iteration, \
-    km_diversity.iteration, km_hc.iteration)
-\end{lstlisting}
+\end{enumerate}
 
 \end{document}
