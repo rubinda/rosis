@@ -115,10 +115,10 @@ class App(QWidget):
         p3 = float(self.input_phase3.text() or 0)
         p4 = float(self.input_phase4.text() or 0)
 
-        s1 = A1 * np.sin(2 * np.pi * f1 * time_interval + p1 + time.time())
-        s2 = A2 * np.sin(2 * np.pi * f2 * time_interval + p2 + time.time())
-        s3 = A3 * np.sin(2 * np.pi * f3 * time_interval + p3 + time.time())
-        s4 = A4 * np.sin(2 * np.pi * f4 * time_interval + p4 + time.time())
+        s1 = A1 * np.sin(2 * np.pi * f1 * (time_interval + time.time()) + p1)
+        s2 = A2 * np.sin(2 * np.pi * f2 * (time_interval + time.time()) + p2)
+        s3 = A3 * np.sin(2 * np.pi * f3 * (time_interval+ time.time()) + p3 )
+        s4 = A4 * np.sin(2 * np.pi * f4 * (time_interval+ time.time()) + p4 )
 
         self.ax.clear()
         self.ax.set_xlim([0, 3.2])
