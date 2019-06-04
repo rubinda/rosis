@@ -117,8 +117,8 @@ class App(QWidget):
 
         s1 = A1 * np.sin(2 * np.pi * f1 * (time_interval + time.time()) + p1)
         s2 = A2 * np.sin(2 * np.pi * f2 * (time_interval + time.time()) + p2)
-        s3 = A3 * np.sin(2 * np.pi * f3 * (time_interval+ time.time()) + p3 )
-        s4 = A4 * np.sin(2 * np.pi * f4 * (time_interval+ time.time()) + p4 )
+        s3 = A3 * np.sin(2 * np.pi * f3 * (time_interval + time.time()) + p3 )
+        s4 = A4 * np.sin(2 * np.pi * f4 * (time_interval + time.time()) + p4 )
 
         self.ax.clear()
         self.ax.set_xlim([0, 3.2])
