@@ -1,1 +1,10 @@
 venv/
+
+# Latex
+*.aux
+*.bbl
+*.blg
+*.log
+*.out
+*.dvi
+*.synctex.gz
