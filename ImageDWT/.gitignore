@@ -1,0 +1,9 @@
+/venv
+.idea/
+__pycache__/
+
+# Remove images, since they are relatively large
+images/
+
+# Keep only the zipped metrics version
+metrics/*.csv

@@ -1,0 +1,13 @@
+# ignore wav files, since they are pretty large
+*.wav
+
+# ignore python virtualenv
+venv/
+
+# macOS
+*.DS_Store
+.AppleDouble
+.LSOverride
+
+# pycharm
+.idea/
