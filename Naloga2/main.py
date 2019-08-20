@@ -2,7 +2,7 @@ import sys
 import time
 import numpy as np
 import matplotlib
-matplotlib.use('TkAgg')
+matplotlib.use('a2gg')
 from matplotlib import pyplot as plt
 from matplotlib import animation
 from matplotlib.figure import Figure

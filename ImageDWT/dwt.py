@@ -177,8 +177,8 @@ def main(args):
 
     image_file = args.image
     if args.wavelet == 'test':
-        # Test some discrete wavelets in pywt
-        wavelets = ['bior1.3', 'rbio3.3', 'haar', 'db4', 'coif1', 'sym2', 'dmey']
+        # Test some discrete wavelets in pywt (dmey excluded because memory error?)
+        wavelets = ['bior1.3', 'rbio3.3', 'haar', 'db4', 'coif1', 'sym2']
         test_wavelets(image_file, threshold_value, dec_level, threshold_mode, wavelets)
     else:
         wavelet = pywt.Wavelet(args.wavelet)
