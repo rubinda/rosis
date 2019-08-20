@@ -67,38 +67,48 @@ def envelope(signal, subs=16):
 
 def get_bpm(data, fs, lvls=4, max_dec=16, pks=1, aprx='median'):
     """Calculates the approximate BPM for the given data"""
-
     # DWT with 'db4' and n decomposition levels
     song_dwt = pywt.wavedec(data, wavelet='db4', level=lvls)
     # Prvi izhod je aproksimacija na podani stopnji, ostalo so detajli
-    cdminlen = int(len(song_dwt[4]) / max_dec + 1)
-    song_approx = np.zeros(cdminlen)
+    # Use the approximation on the lowest level OR a combination of all (uncomment the next code)
+    # song_approx = envelope(song_dwt[0], subs=16)
 
     # Calculate the envelope and decimate for the correct ammount (the levels are
     # given the in reverse order (lvl 0/1 = max level of DWT)
+    cdminlen = int(len(song_dwt[4]) / max_dec + 1)
+    song_approx = np.zeros(cdminlen)
     for lvl, band in enumerate(song_dwt):
         sub_factor = lvl - 1 if lvl-1 > 0 else 0
-        env = envelope(band, subs=2**sub_factor)
+        env = envelope(band, subs=2**sub_factor * 16)
         song_approx = env[:cdminlen] + song_approx
-    # plt_signal(song_approx, time=np.linspace(0, len(song_approx)/step, num=len(song_approx)),
-    #           fignum=2, title='Aproksimacija na nivoju {}'.format(levels))
-    
+
     # Get the min and max index for the appropriate interval on the data
     # (between 40 and 220 BPMs)
-    min_idx = int(60. / 220 * (fs / max_dec))
+    min_idx = int(60. / 200 * (fs / max_dec))
     max_idx = int(60. / 40 * (fs / max_dec))
     corr = autocorrelate(song_approx)
-
     # Use a single peak or multiple
     if pks < 2:
         peak_idx = single_peak(corr[min_idx:max_idx])
-        peak_bpm = int(60. / (peak_idx + min_idx) * fs / max_dec)
+        peak_bpm = 60. / (peak_idx + min_idx) * fs / max_dec
         return peak_bpm
     else:
         # Find the peaks on the given interval and select the N (=pks) most prominent ones
         peaks = scipy.signal.find_peaks(corr[min_idx:max_idx], distance=5)[0]
-        prominences = scipy.signal.peak_prominences(corr[min_idx:max_idx], peaks, wlen=5)[0]
+        prominences = scipy.signal.peak_prominences(corr[min_idx:max_idx], peaks)[0]
         prominent_peaks = sorted(zip(peaks, prominences), key=lambda p: p[1], reverse=True)[:pks]
+
+        # Plots the most prominent peaks with the limited autocorrelation signal
+        # (!) break the for loop in main or you will get a lot of plots (!)
+        # p = np.array([pp[0] for pp in prominent_peaks])
+        # plt.plot(np.linspace(min_idx, max_idx, num=len(corr[min_idx:max_idx])), corr[min_idx:max_idx])
+        # plt.plot(p+min_idx, corr[p+min_idx], 'x')
+        # plt.xlabel('Vzorci (relativno na 40-200 BPM)')
+        # plt.ylabel('Amplituda')
+        # plt.title('Vrhovi omejenega območja pesmi Staying Alive')
+        # plt.show()
+        # return 0
+
         if len(prominent_peaks) < 1:
             # No peaks are present in the signal, BPM is 0?
             return 0
@@ -117,7 +127,7 @@ def get_bpm(data, fs, lvls=4, max_dec=16, pks=1, aprx='median'):
             return current_bpm
 
 
-def main(file_name, levels=4, window_duration=5, peak_count=1, approx='mean', silent=False):
+def main(file_name, levels=4, window_duration=5, peak_count=1, approx='median', silent=False):
     """
     Run BPM detection on a file. The window is shifted for 1 second (e.g. win_duration=5: 0-5, 1-6, 2-7, 3-8 ...).
 
@@ -129,7 +139,7 @@ def main(file_name, levels=4, window_duration=5, peak_count=1, approx='mean', si
     :param approx: approximation method (mean or median)
     :return: average BPM for the file and each window
     """
-    max_decimation = 2 ** levels    # maximum subsample of original data from DWT
+    max_decimation = 2 ** levels * 16  # maximum subsample of original data from DWT (and envelope)
     sample_pointer = 0  # current sample position
     fs, song = wavfile.read(file_name)
     window_samples = window_duration * fs   # samples in a window
@@ -179,5 +189,6 @@ if __name__ == '__main__':
     parser.add_argument('-p', '--peaks', help='How many (autocorrelation) peaks to use for BPM calculation',
                         default=1, type=int)
     parser.add_argument('-a', '--approx', help='Approximation method', choices=['mean', 'median'], default='median')
+    parser.add_argument('-s', '--silent', help='Do not draw plots', action='store_true')
     args = parser.parse_args()
-    main(args.file, args.levels, args.window, args.peaks, args.approx)
+    main(args.file, args.levels, args.window, args.peaks, args.approx, silent=args.silent)
