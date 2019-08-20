@@ -178,7 +178,7 @@ def main(args):
     image_file = args.image
     if args.wavelet == 'test':
         # Test some discrete wavelets in pywt
-        wavelets = ['bior1.1', 'bior1.3', 'rbio1.1', 'haar', 'db1', 'db4', 'coif1', 'sym2']
+        wavelets = ['bior1.3', 'rbio3.3', 'haar', 'db4', 'coif1', 'sym2', 'dmey']
         test_wavelets(image_file, threshold_value, dec_level, threshold_mode, wavelets)
     else:
         wavelet = pywt.Wavelet(args.wavelet)
@@ -220,9 +220,9 @@ if __name__ == '__main__':
     _parser.add_argument('-g', '--grayscale', help='set when using a grayscale image', action='store_true')
     _parser.add_argument('-w', '--wavelets', help='list wavelets available', action='store_true')
     _parser.add_argument('-v', '--verbose', help='output more info about current operations', action='store_true')
-    _parser.add_argument('-t', '--threshold', help='threshold value')
-    _parser.add_argument('-m', '--mode', help='threshold mode')
-    _parser.add_argument('-l', '--levels', help='decomposition levels')
+    _parser.add_argument('-t', '--threshold', help='threshold value', type=int, default=20)
+    _parser.add_argument('-m', '--mode', help='threshold mode', choices=['soft', 'hard'], default='soft')
+    _parser.add_argument('-l', '--levels', help='decomposition levels', type=int, default=4)
     params = _parser.parse_args()
 
     main(params)

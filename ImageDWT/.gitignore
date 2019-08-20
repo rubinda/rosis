@@ -3,7 +3,9 @@
 __pycache__/
 
 # Remove images, since they are relatively large
-images/
+images/*
+# But keep the ones for the report
+!images/report/
 
 # Keep only the zipped metrics version
 metrics/*.csv

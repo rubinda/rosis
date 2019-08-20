@@ -5,8 +5,8 @@
 #
 # For the tested wavelets see dwt.py (line 181):
 # wavelets = ['bior1.1', 'bior1.3', 'rbio1.1', 'haar', 'db1', 'db4', 'coif1', 'sym2']
-
 import dwt
+
 
 class Namespace:
     def __init__(self, **kwargs):

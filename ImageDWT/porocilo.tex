@@ -52,14 +52,57 @@ Nad rezultatom DVT uporabite ali trdo ali mehko odstranjevanje motenj in visokih
 
 \section{Rezultati}
 
-%\begin{figure}[htbp]
-%\begin{center}
-%\i%cludegraphics[scale=0.3]{slika-primer.png}
-%\caption{Vsako sliko opremi s podnapisom, ki pove, kaj slika prikazuje.}
-%\label{slika1}
-%\end{center}
-%\end{figure}
+Za testiranje svoje rešitve sem si izbral 4 slike (slike~\ref{slika1}, ~\ref{slika2}, ~\ref{slika3} in ~\ref{slika4}). Testiral sem 7 različnih valčkov, ki so skupaj z grafi prikazani na sliki~\ref{wavelets}. Rešitev je implementirana kot Python program (\textit{dwt.py}), zahtevane knjižnice pa so naštete znotraj \textit{requirements.txt}.
+
+Nad 7 omenjenih valčkov sem testiral kombinacije naslednjih parametrov
+\begin{itemize}
+	\item pragovi rezanja ... [2, 20, 50, 150],
+    \item mehko in trdo pragovno odstranjevanje motenj,
+    \item število nivojev dekompozicije ... [1, 4, 9],
+\end{itemize}
+kar skupaj nanese 96 kombinacij. Rezultati vsakega poskusa stiskanja (Pearsonova korelacija, normaliziran RMSE in kompresijsko razmerje) so shranjeni v direktoriju \textit{metrics/}, kjer je ime datoteke sestavljeno kot:
+$$slika\_prag\_funkcija\_dekompozicija.csv$$
+Datoteka je v .csv formatu, kjer prva vrstica predstavlja imena stolpcev (\textit{header)}, naslednjih 7 pa vsebuje prej omenjene metrike za vsak posamezen valček.
+
+\begin{figure}[htbp]
+\begin{center}
+\includegraphics[width=1\textwidth]{images/adventuretime.jpg}
+\caption{Slika iz risanke, veliko ostrih prehodov brav.}
+\label{slika1}
+\end{center}
+\end{figure}
+
+\begin{figure}[htbp]
+\begin{center}
+\includegraphics[width=1\textwidth]{images/country.jpg}
+\caption{Slika pokrajine, veliko podrobnosti.}
+\label{slika2}
+\end{center}
+\end{figure}
+
+\begin{figure}[htbp]
+\begin{center}
+\includegraphics[width=1\textwidth]{images/gray.jpeg}
+\caption{Sivinska slika.}
+\label{slika3}
+\end{center}
+\end{figure}
+
+\begin{figure}[htbp]
+\begin{center}
+\includegraphics[width=1\textwidth]{images/hubble2000x2000.png}
+\caption{Slika vesolja (Hubble), pomembno je ohraniti majhne zvezde.}
+\label{slika4}
+\end{center}
+\end{figure}
 
 
+\begin{figure}[htbp]
+\begin{center}
+\includegraphics[width=1\textwidth]{images/report/wavelets.pdf}
+\caption{Valčki uporabljeni pri testiranju}
+\label{wavelets}
+\end{center}
+\end{figure}
 
 \end{document}
