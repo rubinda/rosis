@@ -15,16 +15,14 @@ class Namespace:
 
 if __name__ == '__main__':
     folder = 'images/'
-    images = ['adventuretime.jpg', 'country.jpg', 'gray.jpeg', 'hubble2000x2000.png']
+    images = ['adventuretime.jpg', 'country.jpg', 'barbara_gray.png', 'hubble2000x2000.png']
     grayscale = [False, False, True, False]
     threshold_values = [2, 20, 50, 150]
     threshold_modes = ['soft', 'hard']
     decomposition_levels = [1, 4, 9]
 
-    for val in threshold_values:
-        for mod in threshold_modes:
-            for lvl in decomposition_levels:
-                for gry, img in zip(grayscale, images):
-                    args = Namespace(image=folder+img, wavelet='test', threshold=val,
-                                     mode=mod, levels=lvl, grayscale=gry, wavelets=False, verbose=False)
-                    dwt.main(args)
+    for gry, img in zip(grayscale, images):
+        args = Namespace(image=folder+img, wavelet='test', threshold=threshold_values,
+                         mode=threshold_modes, levels=decomposition_levels, grayscale=gry,
+                         wavelets=False, verbose=False)
+        dwt.main(args)

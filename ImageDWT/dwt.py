@@ -3,12 +3,13 @@
 # Program za stiskanje in ciscenje slik s pomocjo DWT (Discrete Wavelet Transform)
 # Za vec podrobnosti glej porocilo.pdf
 # @author David Rubin
-import pywt
-import cv2
 import os
+import cv2
 import sys
 import csv
+import pywt
 import argparse
+import itertools
 import numpy as np
 from scipy.stats import pearsonr
 
@@ -26,34 +27,50 @@ def calc_nrmse(x, y):
     return rmse/observed_mean
 
 
-def test_wavelets(img, tval, tlev, tmode, wavs):
-    """Test all possible wavelets and return top 3"""
-    wavelets = wavs
-    # Holds the metrics for each wavelet in format
-    # metrics[<wavelet>] = (<pearson corr.>, <nrmse>, <compression ratio>)
+def test_wavelets(image_file, thresholds, dec_levels, threshold_modes, wavelets):
+    """Test the given parameters on the image"""
+    # Holds the metrics for each wavelet, threshold, mode and dec_levels combination
     metrics = []
-    print('\n>{}\tTH:{} TM:{} DL:{}'.format(img, tval, tmode, tlev))
-    for i, wav in enumerate(wavelets):
-        print('\tTesting {} ({}/{})'.format(wav, i+1, len(wavelets)))
-        _pr, _r, _cr = _test_wavelet(img, wav, tval, tlev, tmode)
-        metrics.append({'wavelet': wav, 'pearson correlation': _pr, 'nrmse': _r, 'compression ratio': _cr})
+    params = [thresholds, dec_levels, threshold_modes, wavelets]
+    i = 0
+    print('\n>{}'.format(image_file))
+    for test_case in list(itertools.product(*params)):
+        i += 1
+        th, dl, tm, wav = test_case
+        print('\tTesting {}:\tT:{}\tL:{}\tM:{}'.format(wav, th, dl, tm))
+        _pr, _r, _cr = _test_wavelet(image_file, wav, th, dl, tm)
+        metrics.append({'wavelet': wav, 'pearson correlation': _pr, 'nrmse': _r, 'compression ratio': _cr,
+                        'mode': tm, 'threshold': th, 'levels': dl})
+    print('Tested {} combinations'.format(i))
     # Write the metrics into a csv file
-    csv_file, _ = os.path.splitext(img)
+    csv_file, _ = os.path.splitext(image_file)
     csv_file = csv_file.split('/')[-1]
-    write_metrics(metrics, '{}_{}_{}_{}.csv'.format(csv_file, tval, tmode, tlev))
+    write_metrics(metrics, '{}_metrics.csv'.format(csv_file))
 
 
 def _test_wavelet(img, wav, tval, tlev, tmode):
     """Calculates all the metrics on a given wavelet"""
     img_dat = read_image(img, _args.grayscale)
-    dwt_dat = dwt(img_dat, wav, dl=tlev)
-    den_dat = threshold(dwt_dat, tval, mode=tmode)
-    den_img = idwt(den_dat, wav)
-    img_no_a = remove_alpha(den_img)
-    n_f = save_image(img, img_no_a)
+    den_img = []
+    for channel in cv2.split(img_dat):
+        # Izvedi 2D DWT nad barvnim kanalom
+        dwt_data = dwt(channel, wav, dl=tlev)
+
+        # Izvedi pragovno odstranjevanje motenj
+        denoised_data = threshold(dwt_data, tval, mode=tmode)
+
+        # Pretvori obdelan kanal z iDWT in ga shrani
+        den_img.append(idwt(denoised_data, wav))
+
+    # V kolikor je vec kanalov (ni grayscale) jih zdruzi v sliko
+    if len(den_img) > 1:
+        new_image = cv2.merge(den_img)
+    else:
+        new_image = den_img[0]
+    n_f = save_image(img, new_image)
     _cr = calc_compression(img, n_f)
-    _pr = pearson(img_dat, img_no_a)
-    _r = calc_nrmse(img_dat.ravel(), img_no_a.ravel())
+    _pr = pearson(img_dat, new_image)
+    _r = calc_nrmse(img_dat.ravel(), new_image.ravel())
     return _pr, _r, _cr
 
 
@@ -64,7 +81,7 @@ def read_image(file, is_gray=False):
     if is_gray:
         d = cv2.imread(file, cv2.IMREAD_GRAYSCALE)
     else:
-        d = cv2.imread(file)
+        d = cv2.imread(file, cv2.IMREAD_UNCHANGED)
     if _args.verbose:
         print(' done.')
     return d
@@ -91,7 +108,7 @@ def dwt(data, wav, dl=1):
     return d
 
 
-def idwt(data, wav):
+def idwt(data, wav, dl=1):
     """Reconstruct the image (inverse DWT)"""
     if _args.verbose:
         print('Reconstrucing image (iDWT) ...', end='')
@@ -109,17 +126,6 @@ def threshold(data, value, mode='hard'):
     if _args.verbose:
         print(' done.')
     return d
-
-
-def remove_alpha(data):
-    """
-    Check if we should remove the alpha channel
-
-    Use with caution, as it ignores transparency on images!
-    """
-    if not _args.grayscale:
-        data = data[:, :, :3].astype('uint8')
-    return data
 
 
 def pearson(original, modified):
@@ -163,9 +169,9 @@ def main(args):
     global _args
     _args = args
     # Parametri pri stiskanju in odstranjevanju suma
-    threshold_value = int(args.threshold)
+    threshold_value = args.threshold
     threshold_mode = args.mode
-    dec_level = int(args.levels)
+    dec_level = args.levels
 
     if not os.path.isfile(args.image):
         print('Given file <{}> does not exist!'.format(args.image))
@@ -178,39 +184,48 @@ def main(args):
     image_file = args.image
     if args.wavelet == 'test':
         # Test some discrete wavelets in pywt (dmey excluded because memory error?)
-        wavelets = ['bior1.3', 'rbio3.3', 'haar', 'db4', 'coif1', 'sym2']
+        wavelets = ['bior1.3', 'haar', 'db4', 'coif1', 'sym2']
         test_wavelets(image_file, threshold_value, dec_level, threshold_mode, wavelets)
     else:
-        wavelet = pywt.Wavelet(args.wavelet)
         # Preberi sliko s pomocjo opencv
         image_data = read_image(image_file, args.grayscale)
+        wavelet = pywt.Wavelet(args.wavelet)
+        # V kolikor levels ni podan uporabi pywt max level funkcijo
+        dec_level = int(args.levels) if args.levels else pywt.dwtn_max_level(image_data[0].shape, wavelet)
+        # Sliko razdeli v kanale (grayscale ima le enega) in obdelaj vsak kanal
+        # Note: opencv po privzetem prebere sliko kot BGR oz. BGRA in ne RGB
+        denoised_image = []
+        for channel in cv2.split(image_data):
+            # Izvedi 2D DWT nad barvnim kanalom
+            dwt_data = dwt(channel, wavelet, dl=dec_level)
 
-        # Na sliki izvedi DWT (diskretna valcna transformacija)
-        dwt_data = dwt(image_data, wavelet, dl=dec_level)
-        # Izvedi mehko ali trdo pragovno funkcijo
-        denoised_data = threshold(dwt_data, threshold_value, mode=threshold_mode)
+            # Izvedi pragovno odstranjevanje motenj
+            denoised_data = threshold(dwt_data, threshold_value, mode=threshold_mode)
 
-        # Rekonstruiraj sliko
-        denoised_image = idwt(denoised_data, wavelet)
-        # V primeru png odstrani morebitni alpha kanal (problem ce delas z 24bit RGB slikami,
-        # opencv doda alpha kanal in slika postane 32bit RGBA)
-        # V kolikor je grayscale ali png se ne zgodi nic
-        image_no_alpha = remove_alpha(denoised_image)
+            # Pretvori obdelan kanal z iDWT in ga shrani
+            denoised_image.append(idwt(denoised_data, wavelet))
+
+        # V kolikor je vec kanalov (ni grayscale) jih zdruzi v sliko
+        if len(denoised_image) > 1:
+            new_image = cv2.merge(denoised_image)
+        else:
+            new_image = denoised_image[0]
 
         # Pearson korelacija
-        pr = pearson(image_data, image_no_alpha)
+        pr = pearson(image_data, new_image)
 
         # normaliziran RMSE
-        r = calc_nrmse(image_data.ravel(), image_no_alpha.ravel())
+        r = calc_nrmse(image_data.ravel(), new_image.ravel())
 
         # Shrani sliko v _new
-        new_file = save_image(image_file, image_no_alpha)
+        new_file = save_image(image_file, new_image)
 
         # Izracunaj razmerje stiskanja
         cr = calc_compression(image_file, new_file)
 
         # Prikazi rezultate
-        print_metrics(pr, r, cr, new_file, threshold_value, threshold_mode, dec_level, wavelet)
+        print_metrics(pr, r, cr, new_file, threshold_value, threshold_mode,
+                      dec_level, wavelet)
 
 
 if __name__ == '__main__':
@@ -222,7 +237,7 @@ if __name__ == '__main__':
     _parser.add_argument('-v', '--verbose', help='output more info about current operations', action='store_true')
     _parser.add_argument('-t', '--threshold', help='threshold value', type=int, default=20)
     _parser.add_argument('-m', '--mode', help='threshold mode', choices=['soft', 'hard'], default='soft')
-    _parser.add_argument('-l', '--levels', help='decomposition levels', type=int, default=4)
-    params = _parser.parse_args()
+    _parser.add_argument('-l', '--levels', help='decomposition levels', type=int)
+    _params = _parser.parse_args()
 
-    main(params)
+    main(_params)
