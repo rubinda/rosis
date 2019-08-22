@@ -48,7 +48,7 @@ Postopek detekcije ritma je povzet po opisu v članku~\cite{tzanetakis2002musica
 
 \item \textbf{Izračun diskretne valčne transformacije nad signalom.}
 
-S pomočjo poljubne knjižnice izračunajte diskretno valčno transformacijo (DVT) signala. Uporabite Daubechies-ev valček 4. stopnje ("\textit{db4}"). Število nivojev dekompozicije določite sami, pazite le, da boste z izbranim nivojem dobro zaznali base v glasbi. Dobro preverite, kako so v izhodu DVT-ja zapisani izhodni signali (podrobnosti in približek vhodnega signala). Izhodne signale prevzorčite nazaj  na osnovno vzorčevalno frekvenco.
+S pomočjo poljubne knjižnice izračunajte diskretno valčno transformacijo (DVT) signala. Uporabite Daubechies-ev valček 4. stopnje (\textit{db4}). Število nivojev dekompozicije določite sami, pazite le, da boste z izbranim nivojem dobro zaznali base v glasbi. Dobro preverite, kako so v izhodu DVT-ja zapisani izhodni signali (podrobnosti in približek vhodnega signala). Izhodne signale prevzorčite nazaj  na osnovno vzorčevalno frekvenco.
 Izberite EN SAM izhodni signal (podrobnosti ali približek na določeni stopnji) - tisti, ki najbolje kodira ritem v glasbi. Ne pozabite na stopnjo podvzorčenja  izhodnega signala DVT (v primerjavi z osnovno vzorčevalno frekvenco)! 
 
 \item \textbf{Izračun enostavne ovojnice}
@@ -59,10 +59,10 @@ Za izbran izhodni signal izračunajte enostavno ovojnico (implementirajte funkci
 	Vsem vzorcem v signalu pripišemo pozitivni predznak: $z[n] = abs(y[n])$. 
 	
 	\item \textbf{Filtriranje ovojnice z nizkoprepustnim enopolnim filtrom}
-	$w[n] = (1-a)z[n] + aw[n-1]$, kjer je $a=0.99$. S tem zgladimo ovojnico.
+	$w[n] = (1-a)\cdot z[n] + a\cdot w[n-1]$, kjer je $a=0.99$. S tem zgladimo ovojnico.
 	
 	\item \textbf{Podvzorčenje ovojnice}
-	$w[n] = w[Factor*n]$, kjer je navadno $Factor=16$. S tem pohitrimo kasnješe korake algoritma.
+	$w[n] = w[Factor \cdot n]$, kjer je navadno $Factor=16$. S tem pohitrimo kasnješe korake algoritma.
 	
 	\item \textbf{Odstranitev srednje vrednosti}
 	Od signala odštejemo njegovo srednjo vrednost ($mean$).
@@ -90,7 +90,7 @@ Rezultat postopka naj bo izrisan graf, ki prikazuje ritem glasbe/posnetka v odvi
 
 \section{Rezultati}
 
-Nalogo sem implementiral kot \textit{Python} program, ki zahteva knjižnice navedene v \textit{requirements.txt}. Pri implementaciji naloge sem imel nekaj težav s sledenjem navodil, tako da sem nekaj korakol priredil po svoje v želji po doseganju boljših rezultatov. Slednje je opisano v naslednjih podpoglavjih.
+Nalogo sem implementiral kot \textit{Python} program, ki zahteva knjižnice navedene v \textit{requirements.txt}. Pri implementaciji naloge sem imel nekaj težav s sledenjem navodil, tako da sem nekaj korakov priredil po svoje v želji po doseganju boljših rezultatov. Slednje je opisano v naslednjih podpoglavjih.
 
 \subsection{Algoritem z več vrhovi}
 

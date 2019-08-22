@@ -234,7 +234,7 @@ TOP 3 metrics from metrics/noisy_metrics.csv
 	  coif1	      150	     4	soft	    0.958285 	0.248087	   3.994817
 	   sym2	      150	     4	soft	    0.958226 	0.248158	   3.958366
 \end{verbatim}
-Primerjava vseh štirih slik je na voljo na sliki~\ref{noisy:cmp}.
+Primerjava vseh štirih slik je na voljo na sliki~\ref{noisy:cmp}. Pri sliki~\ref{noisy:comp:pearson} je kompresijsko razmerje $>4.20$, tako da je slika že precej zamegljena in je že težko razbrati posamezne predmete, pojavijo se tudi artefakti. Pri sliki~\ref{noisy:comp:nrmse}, kjer je najmanjši NRMSE, pa se predmeti še dokaj jasno vidni, vendar je še vedno prisotna zamegljenost zaradi šuma. 
 
 
 \begin{figure}
@@ -257,7 +257,7 @@ Primerjava vseh štirih slik je na voljo na sliki~\ref{noisy:cmp}.
 \includegraphics[width=1\textwidth]{images/report/noisy_pearson_comp.jpg}
 \caption{Šumna slika obdelana s Daubechies 4 valčkom, pragovno vredost 150, 4 nivoji dekompozicije in mehko pragovno funkcijo.} \label{noisy:comp:pearson}
 \end{subfigure}
-\label{noisy:cmp}
+\caption{Primerjava slik, kjer je bil dodan šum.} \label{noisy:cmp}
 \end{figure}
 
 \end{document}

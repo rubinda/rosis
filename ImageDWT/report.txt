@@ -1,0 +1,3 @@
+Porocilo je zaradi prevelike velikosti (15MB) bilo objavljeno na Githubu. Razlog te velikosti so verjetno slike, ki so vstavljene.
+
+https://github.com/rubinda/rosis/blob/master/BeatDetect/porocilo.pdf
